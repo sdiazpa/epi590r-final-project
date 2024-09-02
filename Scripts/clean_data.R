@@ -1,6 +1,7 @@
 
 #######################################################################
-# Script: R Bootcamp - Final Project							                    #
+# Script: Clean Data																									#
+#	Project: R Bootcamp - Final Project							                    #
 # Programmer:   Santino Diaz-Palma                                    #
 #                                                                     #
 # Purpose: This script is how I created my clean dataset to be used   #
