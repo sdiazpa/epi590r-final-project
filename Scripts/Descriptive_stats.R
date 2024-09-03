@@ -38,7 +38,7 @@ lgbtq <- read_csv(here::here("Data", "movieData.csv"),
 								 													 		"Other",
 								 													 		"Portuguese")))
 
-# simple table
+# TABLE 1
 tbl_summary(
 	lgbtq,
 	by = adult,
@@ -54,6 +54,20 @@ tbl_summary(
 		video ~ "Video"
 	),
 	missing_text = "Missing"
-)
+) |>
+add_p(test = list(
+	all_continuous() ~ "t.test",
+	all_categorical() ~ "chisq.test"
+)) |>
+	# add a total column with the number of observations
+	add_overall(col_label = "**Total** N = {N}") |>
+	bold_labels() |>
+	# remove the default footnotes
+	modify_footnote(update = everything() ~ NA) |>
+	# replace the column headers and make them bold
+	modify_header(label = "**Variable**", p.value = "**P**")
+
+
+
 
 
