@@ -19,6 +19,7 @@ library(here)
 #	to our research question.
 lgbtq_cols <- c("id","title","original_title","original_language","overview", "release_date",
 								"popularity", "vote_average", "vote_count", "adult", "video", "genre_ids")
+languages_above_100 <- c("en", "de", "fr", "it", "ja", "es", "pt", "sp")
 lgbtq <- read_csv(here::here("Data", "movieData.csv"),
 									na = c("-1", "-2", "-3", "-4", "-5", "-998", "xx"),
 									skip = 1,
