@@ -51,7 +51,16 @@ summary(lgbtq)
 		lgbtq_cats <- lgbtq |>
 			mutate(
 				 adult = factor(adult, labels = c("No", "Yes")),
-				 video = factor(video, labels = c("No", "Yes")))
+				 video = factor(video, labels = c("No", "Yes")),
+				 original_language = factor(original_language, labels =
+				 													 	c("German",
+				 													 		"English",
+				 													 		"French",
+				 													 		"Italian",
+				 													 		"Japanese",
+				 													 		"Spanish",
+				 													 		"Other",
+				 													 		"Portuguese")))
 
 # check to make sure coding is correct
 	count(lgbtq_cats, adult)
@@ -93,8 +102,6 @@ lgbtq <- read_csv(here::here("Data", "movieData.csv"),
 				 													 		"Spanish",
 				 													 		"Other",
 				 													 		"Portuguese")))
-
-
 
 ## Create folder for clean data (if it doesn't exist already)
 if (!dir.exists(here::here("data", "clean"))) {

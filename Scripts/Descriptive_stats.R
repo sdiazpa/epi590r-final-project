@@ -65,7 +65,7 @@ add_p(test = list(
 	# remove the default footnotes
 	modify_footnote(update = everything() ~ NA) |>
 	# replace the column headers and make them bold
-	modify_header(label = "**Variable**", p.value = "**P**")
+	modify_header(label = "**Variable**", p.value = "**P-value**")
 
 
 

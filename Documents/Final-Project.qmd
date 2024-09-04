@@ -2,61 +2,135 @@
 title: "Final Project - EPI 590r"
 author: "Santino Diaz-Palma"
 format: html
-	echo: false
+echo: false
 ---
-For my final project, I chose a datset from tidyRainbow Datasets. It contains information about LGBTQ+ movies and their popularity. My goal is to find out what language is most common amongst the popular movies!  
+
+[**Description of my dataset:**]{.underline}
+
+For my final project, I chose a datset from tidyRainbow Datasets. It contains information about LGBTQ+ movies and their popularity. My goal is to find out what language is most common among LGBTQ+ movies! 
+
+*Please see the readme file for more details concerning coding and inclusion/exclusion criteria.*
+
 ```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| output: false
+
 #Lets read in our libraries and the dataset. This section will be hidden from output because
 # that is not something we need to include in our report. Additionally, we will clean the data. 
 # Additionally, I anticipate removing overview and genre_ids from the dataset due to them
 # 	not necessarily being needed to answer my research question(s)
-#| echo: false
-#| warning: false
-#| message: false
 library(tidyverse)
 library(broom)
 library(gtsummary)
 library(here)
 
+#load in clean data
 lgbtq_cols <- c("id","title","original_title","original_language","overview", "release_date",
 								"popularity", "vote_average", "vote_count", "adult", "video", "genre_ids")
-
-lgbtq <- read_csv(here::here("Data", "movieData.csv"), 
-                 na = c("-1", "-2", "-3", "-4", "-5", "-998"),
-									skip = 1, 
+languages_above_100 <- c("en", "de", "fr", "it", "ja", "es", "pt")
+lgbtq <- read_csv(here::here("Data", "movieData.csv"),
+									na = c("-1", "-2", "-3", "-4", "-5", "-998", "xx"),
+									skip = 1,
 									col_names = lgbtq_cols,
-									col_select = -c("overview","genre_ids"))
-#Lets create some more intuitive levels for our categorical variables
-|>
-	mutate(adult_cat = factor(adult, labels = c("Yes", "No")),
-				 sex_cat = factor(sex, labels = c("Male", "Female")),
-				 race_eth_cat = factor(race_eth, labels = c("Hispanic", "Black", "Non-Black, Non-Hispanic")),
-				 eyesight_cat = factor(eyesight, labels = c("Excellent", "Very good", "Good", "Fair", "Poor")),
-				 glasses_cat = factor(glasses, labels = c("No", "Yes")))
-
-#Lets check our NA values and see if were missing anything or need to do cleans
-str(lgbtq)
-
-## Create folder for clean data (if it doesn't exist already)
-if (!dir.exists(here::here("data", "clean"))) {
-	dir.create(here::here("data", "clean"))
-}
-
-## Save complete data in (newly made) folder
-write_rds(lgbtq, here::here("data", "clean", "lgbtq_clean.rds"))
+									col_select = -c("overview","genre_ids")) |>
+	mutate(original_language = as.factor(original_language)) |>
+	mutate(original_language = ifelse(original_language %in% languages_above_100,
+																		as.character(original_language), "Other")) |>
+	mutate(adult = factor(adult, labels = c("No", "Yes")),
+				 video = factor(video, labels = c("No", "Yes")),
+				 original_language = factor(original_language, labels =
+				 													 	c("German",
+				 													 		"English",
+				 													 		"French",
+				 													 		"Italian",
+				 													 		"Japanese",
+				 													 		"Spanish",
+				 													 		"Other",
+				 													 		"Portuguese")))
 ```
 
-For the final project, I will orient this file by the specific objectives we have to achieve. 
-Thus, let's begin with number 1: *Create a {gtsummary} table of descriptive statistics about your data (1 pt
+I've oriented this document to showcase the specific objectives required by the project guidelines. Starting with our **first objective**, let's create a table of descriptive statistics about the data (aka the infamous @tbl-descr).
 
 ```{r}
+#| warning: false
+#| label: tbl-descr
+#| tbl-cap: "Descriptive statistics"
+#| output-location: slide
 
-
+tbl_summary(
+	lgbtq,
+	by = adult,
+	include = c(
+		popularity, vote_average, original_language,
+		vote_count, video
+	),
+	label = list(
+		popularity ~ "Popularity",
+		vote_average ~ "Average Votes",
+		original_language ~ "Language of Film",
+		vote_count ~ "Vote Count",
+		video ~ "Video"
+	),
+	missing_text = "Missing"
+) |>
+add_p(test = list(
+	all_continuous() ~ "t.test",
+	all_categorical() ~ "chisq.test"
+)) |>
+	# add a total column with the number of observations
+	add_overall(col_label = "**Total** N = {N}") |>
+	bold_labels() |>
+	# remove the default footnotes
+	modify_footnote(update = everything() ~ NA) |>
+	# replace the column headers and make them bold
+	modify_header(label = "**Variable**", p.value = "**P-value**")
 
 
 ```
 
+Our **second objective** will be to create a linear regression model (known as @tbl-regression). I've chosen popularity as my outcome, with three predictors (the original language of the film, adult status, and average vote). 
 
+```{r}
+#| label: tbl-regression
+#| tbl-cap: "Linear Regression Model Statistics"
+#| output-location: slide
+#Linear Model
+linear_model <- lm(popularity ~ original_language + adult + vote_average,
+	data = lgbtq
+)
+tbl_regression(
+	linear_model,
+	# include the intercept
+	intercept = TRUE,
+	# relabel the variables
+	label = list(
+		original_language ~ "Language of Film",
+		vote_average ~ "Average Number of Votes",
+		adult ~ "Adult film (y/n)"
+	)
+)
 
+```
+
+The **3rd objective** is to create a @Fig-barplot that represents a variable in the dataset. I chose to showcase which languages have the most LGBTQ+ films. 
+
+```{r}
+#| label: Fig-barplot
+#| fig-cap: "Most Popular Languages amongst LGBTQ+ Films"
+#Figure 1
+lang_freq_table <- table(lgbtq$original_language)
+lang_data <- as.data.frame(lang_freq_table)
+names(lang_data) <- c("Language","Number of Films")
+figure1 <- ggplot(lang_data, aes(x = Language, y = `Number of Films`)) +
+	geom_bar(stat = 'identity', fill = 'skyblue') +
+	labs(title = 'Most Popular Languages amognst LGBTQ+ films', x = 'Language', 
+			 y ='Number of Films') +
+	theme_minimal() +
+	theme(axis.text.x = element_text(angle = 45, hjust = 1))
+print(figure1)
+
+```
 
 
