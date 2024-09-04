@@ -5,12 +5,6 @@ format: html
 echo: false
 ---
 
-[**Description of my dataset:**]{.underline}
-
-For my final project, I chose a datset from tidyRainbow Datasets. It contains information about LGBTQ+ movies and their popularity. My goal is to find out what language is most common among LGBTQ+ movies! 
-
-*Please see the readme file for more details concerning coding and inclusion/exclusion criteria.*
-
 ```{r}
 #| echo: false
 #| warning: false
@@ -49,9 +43,21 @@ lgbtq <- read_csv(here::here("Data", "movieData.csv"),
 				 													 		"Spanish",
 				 													 		"Other",
 				 													 		"Portuguese")))
+
+#### In-line Texts
+lgbtq_stats <- list(n = nrow(lgbtq),
+              			mean_popul = mean(lgbtq$popularity, na=TRUE))
 ```
 
-I've oriented this document to showcase the specific objectives required by the project guidelines. Starting with our **first objective**, let's create a table of descriptive statistics about the data (aka the infamous @tbl-descr).
+[**Description of my dataset:**]{.underline}
+
+For my final project, I chose a datset from tidyRainbow Datasets. It contains information about LGBTQ+ movies (n=`r lgbtq_stats$n`) and their popularity. My goal is to find out what language is most common among LGBTQ+ movies! 
+
+*Please see the readme file for more details concerning instructions, coding, and inclusion/exclusion criteria.*
+
+
+I've oriented this document to showcase the specific objectives required by the project guidelines. Starting with our **first objective**, let's create a table of descriptive statistics about the data (aka the infamous @tbl-descr). 
+*NOTE: This table is stratified by designation of being an Adult Film or not*
 
 ```{r}
 #| warning: false
@@ -59,7 +65,7 @@ I've oriented this document to showcase the specific objectives required by the 
 #| tbl-cap: "Descriptive statistics"
 #| output-location: slide
 
-tbl_summary(
+table1 <- tbl_summary(
 	lgbtq,
 	by = adult,
 	include = c(
@@ -88,9 +94,14 @@ add_p(test = list(
 	modify_header(label = "**Variable**", p.value = "**P-value**")
 
 
+#in-line stats
+table1
+pop_total <- inline_text(table1, 
+                           variable = "popularity", 
+                           column = "stat_0")
 ```
 
-Our **second objective** will be to create a linear regression model (known as @tbl-regression). I've chosen popularity as my outcome, with three predictors (the original language of the film, adult status, and average vote). 
+Our **second objective** will be to create a linear regression model (known as @tbl-regression). I've chosen popularity as my outcome, with three predictors (the original language of the film, adult status, and average vote). For reference, the total popularity is `r pop_total`.
 
 ```{r}
 #| label: tbl-regression
@@ -110,27 +121,27 @@ tbl_regression(
 		vote_average ~ "Average Number of Votes",
 		adult ~ "Adult film (y/n)"
 	)
-)
+) |>
+	modify_header(label = "**Variable**", p.value = "**P-value**")
 
 ```
 
-The **3rd objective** is to create a @Fig-barplot that represents a variable in the dataset. I chose to showcase which languages have the most LGBTQ+ films. 
+The **3rd objective** is to create a @fig-barplot that represents some aspect of the dataset. I chose to showcase which languages have the most LGBTQ+ films using a bar plot.  
 
 ```{r}
-#| label: Fig-barplot
+#| label: fig-barplot
 #| fig-cap: "Most Popular Languages amongst LGBTQ+ Films"
 #Figure 1
 lang_freq_table <- table(lgbtq$original_language)
 lang_data <- as.data.frame(lang_freq_table)
 names(lang_data) <- c("Language","Number of Films")
-figure1 <- ggplot(lang_data, aes(x = Language, y = `Number of Films`)) +
+ggplot(lang_data, aes(x = Language, y = `Number of Films`)) +
 	geom_bar(stat = 'identity', fill = 'skyblue') +
 	labs(title = 'Most Popular Languages amognst LGBTQ+ films', x = 'Language', 
 			 y ='Number of Films') +
 	theme_minimal() +
 	theme(axis.text.x = element_text(angle = 45, hjust = 1))
-print(figure1)
 
 ```
 
-
+In conclusion, we can see that English is the most popular langauge for LGBTQ+ films. 

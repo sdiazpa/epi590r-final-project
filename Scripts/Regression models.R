@@ -58,7 +58,7 @@ lang_freq_table <- table(lgbtq$original_language)
 lang_data <- as.data.frame(lang_freq_table)
 names(lang_data) <- c("Language","Number of Films")
 figure1 <- ggplot(lang_data, aes(x = Language, y = `Number of Films`)) +
-	geom_bar(stat = 'identity', fill = 'skyblue') +
+	geom_bar(stat = 'identity', fill = 'orange') +
 	labs(title = 'Most Popular Languages amognst LGBTQ+ films', x = 'Language', y ='Number of Films') +
 	theme_minimal() +
 	theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -78,3 +78,5 @@ stdevi <- function(x) {
 #confirm that function works as intended
 	stdevi(lgbtq$vote_average)	#function
 	sd(lgbtq$vote_average)		#built-in sd
+
+
