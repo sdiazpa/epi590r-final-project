@@ -51,10 +51,9 @@ lgbtq_stats <- list(n = nrow(lgbtq),
 
 [**Description of my dataset:**]{.underline}
 
-For my final project, I chose a datset from tidyRainbow Datasets. It contains information about LGBTQ+ movies (n=`r lgbtq_stats$n`) and their popularity. My goal is to find out what language is most common among LGBTQ+ movies! 
+For my final project, I chose a dataset from tidyRainbow Datasets. It contains information about LGBTQ+ movies (n=`r lgbtq_stats$n`) and their popularity. My goal is to find out what language is most common among LGBTQ+ movies! 
 
 *Please see the readme file for more details concerning instructions, coding, and inclusion/exclusion criteria.*
-
 
 I've oriented this document to showcase the specific objectives required by the project guidelines. Starting with our **first objective**, let's create a table of descriptive statistics about the data (aka the infamous @tbl-descr). 
 *NOTE: This table is stratified by designation of being an Adult Film or not*
